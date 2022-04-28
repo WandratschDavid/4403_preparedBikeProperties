@@ -1,10 +1,7 @@
 package database;
 
 import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Properties;
 
 /**
@@ -22,6 +19,9 @@ public class Database
 	private static Database instance;
 	private Connection connection;
 	private Statement statement;
+	private PreparedStatement insertStatement;
+	private PreparedStatement updateStatement;
+	private PreparedStatement selectStatement;
 	private String driver;
 	private String url;
 	private String username;
@@ -59,6 +59,9 @@ public class Database
 		try
 		{
 			connection = DriverManager.getConnection(url, username, password);
+			insertStatement = connection.prepareStatement("insert into Bike(rahmennr, markeType, Text) values(?, ?, ?)");
+			updateStatement = connection.prepareStatement("update Bike set markeType=?, text=? where rahmennr=?");
+			selectStatement = connection.prepareStatement("select rahmennr, markeType, text from Bike where rahmennr=?");
 			statement = connection.createStatement();
 		}
 		catch (Exception e)
@@ -117,10 +120,25 @@ public class Database
 	/**
 	 * Getter für dynamisches Datenbank-Statement.
 	 *
-	 * @return dynamishes DB-Statement.
+	 * @return dynamisches DB-Statement.
 	 */
 	public Statement getStatement()
 	{
 		return statement;
+	}
+
+	public PreparedStatement getInsertStatement()
+	{
+		return insertStatement;
+	}
+
+	public PreparedStatement getUpdateStatement()
+	{
+		return updateStatement;
+	}
+
+	public PreparedStatement getSelectStatement()
+	{
+		return selectStatement;
 	}
 }

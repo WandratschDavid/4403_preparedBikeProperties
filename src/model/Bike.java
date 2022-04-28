@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -53,13 +54,9 @@ public class Bike
 	 */
 	public static Bike select(String rahmennr) throws SQLException
 	{
-		String sql = " select rahmennr" +
-				"          ,      markeType" +
-				"          ,      text " +
-				"          from bike " +
-				"          where rahmennr = '" + rahmennr + "'";
-
-		ResultSet resultSet = Database.getInstance().getStatement().executeQuery(sql);
+		PreparedStatement statement = Database.getInstance().getSelectStatement();
+		statement.setString(1, rahmennr);
+		ResultSet resultSet = statement.executeQuery();
 
 		Bike bike;
 		if (resultSet.next())
@@ -170,18 +167,11 @@ public class Bike
 		try
 		{
 			// Insert versuchen
-			String sql
-					= "  insert "
-					+ " into Bike (rahmennr "
-					+ "             ,markeType "
-					+ "             ,Text "
-					+ "             ) "
-					+ " values ( '" + getRahmennr() + "' "
-					+ "        , '" + getMarkeType() + "' "
-					+ "        , '" + getText() + "' "
-					+ "        )";
-
-			Database.getInstance().getStatement().executeUpdate(sql);
+			PreparedStatement statement = Database.getInstance().getInsertStatement();
+			statement.setString(1, getRahmennr());
+			statement.setString(2, getMarkeType());
+			statement.setString(3, getText());
+			statement.executeUpdate();
 		}
 		catch (SQLException e)
 		{
@@ -189,12 +179,11 @@ public class Bike
 			if (e.getSQLState().equals("23505"))
 			{
 				// Update versuchen
-				String sql = "update Bike " +
-						" set markeType  = '" + getMarkeType() + "'" +
-						" ,   text       = '" + getText() + "'" +
-						" where rahmennr = '" + getRahmennr() + "'";
-
-				Database.getInstance().getStatement().execute(sql);
+				PreparedStatement statement = Database.getInstance().getUpdateStatement();
+				statement.setString(1, getRahmennr());
+				statement.setString(2, getMarkeType());
+				statement.setString(3, getText());
+				statement.executeUpdate();
 			}
 			else
 			{
